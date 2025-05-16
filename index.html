@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Logger</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 15px 25px; margin: 10px; font-size: 18px; cursor: pointer; }
+    #subtaskModal { display: none; position: fixed; top: 30%; left: 0; right: 0; text-align: center; background: #fff; padding: 20px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>Log a Task</h1>
+  <button onclick="logTask('Lawn Mowing')">Lawn Mowing</button>
+  <button onclick="showSubtaskModal('Oil Change', ['Car A', 'Car B'])">Oil Change</button>
+  <p id="status" style="margin-top: 20px;"></p>
+
+  <div id="subtaskModal">
+    <h3>Select Vehicle</h3>
+    <div id="subtaskOptions"></div>
+    <button onclick="hideSubtaskModal()">Cancel</button>
+  </div>
+
+  <script>
+    const apiUrl = 'YOUR_WEB_APP_URL'; // Replace with your script URL
+
+    function logTask(task) {
+      fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify({ task }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('status').innerText = `${task} logged at ${new Date().toLocaleString()}`;
+        hideSubtaskModal();
+      })
+      .catch(err => {
+        document.getElementById('status').innerText = 'Error logging task.';
+        console.error(err);
+      });
+    }
+
+    function showSubtaskModal(task, options) {
+      const modal = document.getElementById('subtaskModal');
+      const container = document.getElementById('subtaskOptions');
+      container.innerHTML = '';
+      options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.innerText = option;
+        btn.onclick = () => logTask(`${task} - ${option}`);
+        container.appendChild(btn);
+      });
+      modal.style.display = 'block';
+    }
+
+    function hideSubtaskModal() {
+      document.getElementById('subtaskModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
